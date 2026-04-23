@@ -16,7 +16,7 @@ El proyecto requiere una base de datos relacional en PostgreSQL para soportar la
 
 ## Decisions
 
-- Tabla `usuarios` con campos id, email, password_hash, nombre, activo.
+- Tabla `usuarios` con campos id, email, password (texto plano en demo), nombre, activo.
 - Tabla `proyectos` con id, nombre, descripcion, fecha_inicio, fecha_fin, usuario_responsable_id (FK a usuarios).
 - Tabla `actividades` con id, proyecto_id (FK), nombre, bac, avance_planificado, avance_real, ac.
 - Restricciones NOT NULL y UNIQUE donde aplique (ej: email de usuario).
