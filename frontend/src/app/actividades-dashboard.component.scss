@@ -1,0 +1,241 @@
+:host {
+  display: block;
+  padding: 0 0.75rem 1rem;
+}
+
+.evm-header-card {
+  margin-bottom: 2rem;
+}
+
+.evm-header-banner {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #27A9F5 0%, #27A9F5 80%, rgba(39,169,245,0.05) 100%);
+  border-radius: 1.2rem 1.2rem 0.5rem 0.5rem;
+  padding: 2rem 2.5rem 1.5rem 2.5rem;
+  box-shadow: 0 2px 12px 0 rgba(39,169,245,.08);
+  position: relative;
+  min-height: 110px;
+}
+
+.evm-header-evm {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #fff;
+  background: #27A9F5;
+  border-radius: 1rem;
+  padding: 0.5rem 1.5rem;
+  margin-right: 2rem;
+  box-shadow: 0 2px 8px 0 rgba(39,169,245,.15);
+  letter-spacing: 0.1em;
+  border-left: 8px solid #1a7bb8;
+}
+
+.evm-header-title-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.evm-header-title {
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 8px rgba(39,169,245,.1);
+}
+
+.evm-header-subtitle {
+  color: #e3f4fd;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-top: 0.3rem;
+  letter-spacing: 0.01em;
+}
+
+.dashboard-content {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dashboard-shell-card {
+  overflow: hidden;
+}
+
+.project-summary-card {
+  padding: 1.25rem;
+  border: 1px solid #d7ecfb;
+  box-shadow: 0 8px 24px rgba(12,70,102,.08);
+}
+
+.project-summary-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.project-summary-header h3 {
+  margin: 0 0 0.25rem;
+  color: #0f3f5c;
+}
+
+.project-summary-header p {
+  margin: 0;
+  color: #5f7684;
+}
+
+.project-selector {
+  min-width: 260px;
+}
+
+.summary-loading {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.summary-metric {
+  background: linear-gradient(180deg, #f8fcff 0%, #eef7fc 100%);
+  border: 1px solid #d8e8f2;
+  border-radius: 0.9rem;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.summary-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5f7684;
+}
+
+.summary-metric strong {
+  font-size: 1.1rem;
+  color: #153b52;
+}
+
+.summary-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.summary-status-chip {
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: #eef3f6;
+  color: #355061;
+  font-weight: 600;
+}
+
+.summary-status-chip.is-good {
+  background: #e7f7ed;
+  color: #18603a;
+}
+
+.summary-status-chip.is-bad {
+  background: #fdeceb;
+  color: #9a2f2f;
+}
+
+@media (max-width: 1100px) {
+  .summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .evm-header-banner {
+    padding: 1.5rem 1.5rem 1.25rem;
+  }
+
+  .evm-header-evm {
+    font-size: 2.2rem;
+    margin-right: 1.2rem;
+  }
+
+  .evm-header-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  :host {
+    padding: 0 0.5rem 0.75rem;
+  }
+
+  .evm-header-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: auto;
+    padding: 1.25rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .evm-header-evm {
+    margin-right: 0;
+    font-size: 1.8rem;
+    padding: 0.35rem 0.9rem;
+    border-left-width: 6px;
+  }
+
+  .evm-header-title {
+    font-size: 1.35rem;
+  }
+
+  .evm-header-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .project-summary-header {
+    flex-direction: column;
+  }
+
+  .project-selector {
+    width: 100%;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .dashboard-content {
+    gap: 1.25rem;
+  }
+
+  .project-summary-card {
+    padding: 1rem;
+  }
+
+  .summary-metric {
+    padding: 0.75rem;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

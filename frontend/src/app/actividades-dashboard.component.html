@@ -1,0 +1,67 @@
+
+<div class="evm-header-card">
+	<div class="evm-header-banner">
+		<div class="evm-header-evm">EVM</div>
+		<div class="evm-header-title-group">
+			<h2 class="evm-header-title">Earned Value Management</h2>
+			<div class="evm-header-subtitle">Monitorea el rendimiento y los costos de tus proyectos</div>
+		</div>
+	</div>
+</div>
+
+<mat-card class="dashboard-shell-card">
+	<mat-card-content>
+		<div class="dashboard-content">
+			<app-actividad-form (actividadCreada)="onActividadCreada()" [actividadEditar]="actividadEditar" (edicionFinalizada)="onEdicionFinalizada()" [highlight]="highlightForm"></app-actividad-form>
+
+			<mat-card class="project-summary-card">
+				<div class="project-summary-header">
+					<div>
+						<h3>Resumen consolidado por proyecto</h3>
+						<p>Selecciona un proyecto para ver sus indicadores acumulados.</p>
+					</div>
+					<mat-form-field appearance="outline" class="project-selector">
+						<mat-label>Proyecto</mat-label>
+						<mat-select [(ngModel)]="proyectoSeleccionadoId" (selectionChange)="onProyectoSeleccionado()">
+							<mat-option *ngFor="let proyecto of proyectos" [value]="proyecto.id">{{ proyecto.nombre }}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+
+				<div *ngIf="resumenLoading" class="summary-loading">
+					<mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
+				</div>
+
+				<div *ngIf="resumenError" class="error">{{ resumenError }}</div>
+
+				<div *ngIf="resumenProyecto && !resumenLoading" class="summary-grid">
+					<div class="summary-metric">
+						<span class="summary-label">Actividades</span>
+						<strong>{{ resumenProyecto.total_actividades }}</strong>
+					</div>
+					<div class="summary-metric"><span class="summary-label">PV</span><strong>{{ resumenProyecto.indicadores.pv | number:'1.2-2' }}</strong></div>
+					<div class="summary-metric"><span class="summary-label">EV</span><strong>{{ resumenProyecto.indicadores.ev | number:'1.2-2' }}</strong></div>
+					<div class="summary-metric"><span class="summary-label">AC</span><strong>{{ resumenProyecto.indicadores.ac | number:'1.2-2' }}</strong></div>
+					<div class="summary-metric"><span class="summary-label">CV</span><strong>{{ resumenProyecto.indicadores.cv | number:'1.2-2' }}</strong></div>
+					<div class="summary-metric"><span class="summary-label">SV</span><strong>{{ resumenProyecto.indicadores.sv | number:'1.2-2' }}</strong></div>
+					<div class="summary-metric"><span class="summary-label">CPI</span><strong>{{ resumenProyecto.indicadores.cpi | number:'1.2-3' }}</strong></div>
+					<div class="summary-metric"><span class="summary-label">SPI</span><strong>{{ resumenProyecto.indicadores.spi | number:'1.2-3' }}</strong></div>
+					<div class="summary-metric"><span class="summary-label">EAC</span><strong>{{ resumenProyecto.indicadores.eac | number:'1.2-2' }}</strong></div>
+					<div class="summary-metric"><span class="summary-label">VAC</span><strong>{{ resumenProyecto.indicadores.vac | number:'1.2-2' }}</strong></div>
+				</div>
+
+				<div *ngIf="resumenProyecto && !resumenLoading" class="summary-status-row">
+					<div class="summary-status-chip" [class.is-good]="resumenProyecto.indicadores.cpi >= 1" [class.is-bad]="resumenProyecto.indicadores.cpi > 0 && resumenProyecto.indicadores.cpi < 1">
+						CPI: {{ resumenProyecto.indicadores.interpretacion.cpi_estado }}
+					</div>
+					<div class="summary-status-chip" [class.is-good]="resumenProyecto.indicadores.spi >= 1" [class.is-bad]="resumenProyecto.indicadores.spi > 0 && resumenProyecto.indicadores.spi < 1">
+						SPI: {{ resumenProyecto.indicadores.interpretacion.spi_estado }}
+					</div>
+				</div>
+			</mat-card>
+
+			<app-evm-chart [actividades]="actividades"></app-evm-chart>
+			<app-actividades-table #tabla [proyectoId]="proyectoSeleccionadoId" (editar)="onEditarActividad($event)" (actividadesChange)="onActividadesChange($event)"></app-actividades-table>
+		</div>
+	</mat-card-content>
+</mat-card>
