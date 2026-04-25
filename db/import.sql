@@ -26,6 +26,8 @@ CREATE TABLE actividades (
     avance_planificado NUMERIC(5,2) NOT NULL,
     avance_real NUMERIC(5,2) NOT NULL,
     ac NUMERIC(14,2) NOT NULL
+    fecha_inicio DATE,
+    fecha_fin DATE
 );
 
 -- Datos de ejemplo
