@@ -32,8 +32,20 @@ app.add_middleware(
 
 ACTIVIDAD_NO_ENCONTRADA = "Actividad no encontrada"
 PROYECTO_NO_ENCONTRADO = "Proyecto no encontrado"
-RESPUESTA_404_ACTIVIDAD = {404: {"description": ACTIVIDAD_NO_ENCONTRADA}}
-RESPUESTA_404_PROYECTO = {404: {"description": PROYECTO_NO_ENCONTRADO}}
+RESPUESTA_404_ACTIVIDAD = {
+    404: {"description": ACTIVIDAD_NO_ENCONTRADA},
+    422: {"description": "Datos de entrada inválidos."},
+    500: {"description": "Error interno del servidor."},
+}
+RESPUESTA_404_PROYECTO = {
+    404: {"description": PROYECTO_NO_ENCONTRADO},
+    422: {"description": "Datos de entrada inválidos."},
+    500: {"description": "Error interno del servidor."},
+}
+RESPUESTA_LISTA = {
+    422: {"description": "Parámetros de consulta inválidos."},
+    500: {"description": "Error interno del servidor."},
+}
 
 # --- Utilidad de sesión DB ---
 def get_db():
@@ -116,7 +128,18 @@ class ResumenProyectoEVM(BaseModel):
     indicadores: IndicadoresEVM
 
 # --- Endpoints CRUD Actividades ---
-@app.post("/api/actividades", response_model=ActividadOut, status_code=201, summary="Crear actividad")
+@app.post(
+    "/api/actividades",
+    response_model=ActividadOut,
+    status_code=201,
+    summary="Crear actividad",
+    description="Registra una nueva actividad asociada a un proyecto. Calcula automáticamente los indicadores EVM (PV, EV, AC, CV, SV, CPI, SPI, EAC, VAC) a partir de los datos ingresados.",
+    responses={
+        201: {"description": "Actividad creada exitosamente con indicadores EVM calculados."},
+        422: {"description": "Datos de entrada inválidos."},
+        500: {"description": "Error interno del servidor."},
+    }
+)
 def crear_actividad(actividad: ActividadCreate, db: Annotated[Session, Depends(get_db)]):
     db_actividad = Actividad(**actividad.dict())
     db.add(db_actividad)
@@ -124,19 +147,37 @@ def crear_actividad(actividad: ActividadCreate, db: Annotated[Session, Depends(g
     db.refresh(db_actividad)
     return evm_service.actividad_to_response(db_actividad)
 
-@app.get("/api/actividades", response_model=List[ActividadOut], summary="Listar actividades")
+@app.get(
+    "/api/actividades",
+    response_model=List[ActividadOut],
+    summary="Listar actividades",
+    description="Retorna la lista completa de actividades registradas en el sistema, incluyendo los indicadores EVM calculados para cada una.",
+    responses=RESPUESTA_LISTA
+)
 def listar_actividades(db: Annotated[Session, Depends(get_db)]):
     actividades = db.query(Actividad).all()
     return [evm_service.actividad_to_response(a) for a in actividades]
 
-@app.get("/api/actividades/{actividad_id}", response_model=ActividadOut, summary="Obtener actividad por ID", responses=RESPUESTA_404_ACTIVIDAD)
+@app.get(
+    "/api/actividades/{actividad_id}",
+    response_model=ActividadOut,
+    summary="Obtener actividad por ID",
+    description="Retorna los datos de una actividad específica junto con sus indicadores EVM calculados. Devuelve 404 si la actividad no existe.",
+    responses=RESPUESTA_404_ACTIVIDAD
+)
 def obtener_actividad(actividad_id: int, db: Annotated[Session, Depends(get_db)]):
     actividad = db.query(Actividad).filter(Actividad.id == actividad_id).first()
     if not actividad:
         raise HTTPException(status_code=404, detail=ACTIVIDAD_NO_ENCONTRADA)
     return evm_service.actividad_to_response(actividad)
 
-@app.put("/api/actividades/{actividad_id}", response_model=ActividadOut, summary="Actualizar actividad", responses=RESPUESTA_404_ACTIVIDAD)
+@app.put(
+    "/api/actividades/{actividad_id}",
+    response_model=ActividadOut,
+    summary="Actualizar actividad",
+    description="Actualiza parcialmente los campos de una actividad existente. Solo se modifican los campos enviados en el body. Recalcula los indicadores EVM tras la actualización.",
+    responses=RESPUESTA_404_ACTIVIDAD
+)
 def actualizar_actividad(actividad_id: int, datos: ActividadUpdate, db: Annotated[Session, Depends(get_db)]):
     actividad = db.query(Actividad).filter(Actividad.id == actividad_id).first()
     if not actividad:
@@ -148,7 +189,13 @@ def actualizar_actividad(actividad_id: int, datos: ActividadUpdate, db: Annotate
     db.refresh(actividad)
     return evm_service.actividad_to_response(actividad)
 
-@app.delete("/api/actividades/{actividad_id}", status_code=204, summary="Eliminar actividad", responses=RESPUESTA_404_ACTIVIDAD)
+@app.delete(
+    "/api/actividades/{actividad_id}",
+    status_code=204,
+    summary="Eliminar actividad",
+    description="Elimina permanentemente una actividad del sistema. Retorna 204 sin contenido si la eliminación fue exitosa. Devuelve 404 si la actividad no existe.",
+    responses=RESPUESTA_404_ACTIVIDAD
+)
 def eliminar_actividad(actividad_id: int, db: Annotated[Session, Depends(get_db)]):
     actividad = db.query(Actividad).filter(Actividad.id == actividad_id).first()
     if not actividad:
@@ -158,7 +205,18 @@ def eliminar_actividad(actividad_id: int, db: Annotated[Session, Depends(get_db)
     return None
 
 # --- Endpoints CRUD Proyectos ---
-@app.post("/api/proyectos", response_model=ProyectoOut, status_code=201, summary="Crear proyecto")
+@app.post(
+    "/api/proyectos",
+    response_model=ProyectoOut,
+    status_code=201,
+    summary="Crear proyecto",
+    description="Registra un nuevo proyecto en el sistema. El proyecto debe estar asociado a un usuario responsable existente.",
+    responses={
+        201: {"description": "Proyecto creado exitosamente."},
+        422: {"description": "Datos de entrada inválidos."},
+        500: {"description": "Error interno del servidor."},
+    }
+)
 def crear_proyecto(proyecto: ProyectoCreate, db: Annotated[Session, Depends(get_db)]):
     db_proyecto = Proyecto(
         nombre=proyecto.nombre,
@@ -172,11 +230,23 @@ def crear_proyecto(proyecto: ProyectoCreate, db: Annotated[Session, Depends(get_
     db.refresh(db_proyecto)
     return evm_service.proyecto_to_response(db_proyecto)
 
-@app.get("/api/proyectos", response_model=List[ProyectoOut], summary="Listar proyectos")
+@app.get(
+    "/api/proyectos",
+    response_model=List[ProyectoOut],
+    summary="Listar proyectos",
+    description="Retorna la lista completa de proyectos registrados en el sistema.",
+    responses=RESPUESTA_LISTA
+)
 def listar_proyectos(db: Annotated[Session, Depends(get_db)]):
     return [evm_service.proyecto_to_response(p) for p in db.query(Proyecto).all()]
 
-@app.get("/api/proyectos/{proyecto_id}", response_model=ProyectoOut, summary="Obtener proyecto por ID", responses=RESPUESTA_404_PROYECTO)
+@app.get(
+    "/api/proyectos/{proyecto_id}",
+    response_model=ProyectoOut,
+    summary="Obtener proyecto por ID",
+    description="Retorna los datos de un proyecto específico. Devuelve 404 si el proyecto no existe.",
+    responses=RESPUESTA_404_PROYECTO
+)
 def obtener_proyecto(proyecto_id: int, db: Annotated[Session, Depends(get_db)]):
     proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
     if not proyecto:
@@ -184,7 +254,13 @@ def obtener_proyecto(proyecto_id: int, db: Annotated[Session, Depends(get_db)]):
     return evm_service.proyecto_to_response(proyecto)
 
 
-@app.get("/api/proyectos/{proyecto_id}/resumen-evm", response_model=ResumenProyectoEVM, summary="Obtener resumen EVM del proyecto", responses=RESPUESTA_404_PROYECTO)
+@app.get(
+    "/api/proyectos/{proyecto_id}/resumen-evm",
+    response_model=ResumenProyectoEVM,
+    summary="Obtener resumen EVM del proyecto",
+    description="Calcula y retorna el resumen consolidado de indicadores EVM (PV, EV, AC, CV, SV, CPI, SPI, EAC, VAC) de todas las actividades del proyecto. Devuelve 404 si el proyecto no existe.",
+    responses=RESPUESTA_404_PROYECTO
+)
 def obtener_resumen_proyecto(proyecto_id: int, db: Annotated[Session, Depends(get_db)]):
     proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
     if not proyecto:
@@ -192,7 +268,13 @@ def obtener_resumen_proyecto(proyecto_id: int, db: Annotated[Session, Depends(ge
     actividades = db.query(Actividad).filter(Actividad.proyecto_id == proyecto_id).all()
     return evm_service.resumen_proyecto_to_response(proyecto, actividades)
 
-@app.put("/api/proyectos/{proyecto_id}", response_model=ProyectoOut, summary="Actualizar proyecto", responses=RESPUESTA_404_PROYECTO)
+@app.put(
+    "/api/proyectos/{proyecto_id}",
+    response_model=ProyectoOut,
+    summary="Actualizar proyecto",
+    description="Actualiza parcialmente los campos de un proyecto existente. Solo se modifican los campos enviados en el body. Devuelve 404 si el proyecto no existe.",
+    responses=RESPUESTA_404_PROYECTO
+)
 def actualizar_proyecto(proyecto_id: int, datos: ProyectoUpdate, db: Annotated[Session, Depends(get_db)]):
     proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
     if not proyecto:
@@ -204,7 +286,13 @@ def actualizar_proyecto(proyecto_id: int, datos: ProyectoUpdate, db: Annotated[S
     db.refresh(proyecto)
     return evm_service.proyecto_to_response(proyecto)
 
-@app.delete("/api/proyectos/{proyecto_id}", status_code=204, summary="Eliminar proyecto", responses=RESPUESTA_404_PROYECTO)
+@app.delete(
+    "/api/proyectos/{proyecto_id}",
+    status_code=204,
+    summary="Eliminar proyecto",
+    description="Elimina permanentemente un proyecto del sistema. Retorna 204 sin contenido si la eliminación fue exitosa. Devuelve 404 si el proyecto no existe.",
+    responses=RESPUESTA_404_PROYECTO
+)
 def eliminar_proyecto(proyecto_id: int, db: Annotated[Session, Depends(get_db)]):
     proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
     if not proyecto:
