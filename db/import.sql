@@ -32,7 +32,7 @@ CREATE TABLE actividades (
 
 -- Datos de ejemplo
 INSERT INTO usuarios (email, password_hash, nombre, activo) VALUES
-    ('admin@demo.com', '$2b$12$demoHash', 'Admin Demo', TRUE);
+    ('admin@demo.com', 'admin123', 'Admin Demo', TRUE);
 
 INSERT INTO proyectos (nombre, descripcion, fecha_inicio, fecha_fin, usuario_responsable_id) VALUES
     ('Proyecto Ejemplo', 'Proyecto de ejemplo para pruebas', '2026-04-01', '2026-12-31', 1);
