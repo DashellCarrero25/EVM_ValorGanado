@@ -1,0 +1,41 @@
+.evm-chart-title-bar {
+  background: #f8fcff;
+  border-radius: 14px 14px 0 0;
+  padding: 1rem 1.25rem 0.6rem 1.25rem;
+  margin-bottom: -0.5rem;
+  border: 1px solid #d7ecfb;
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(12, 70, 102, 0.08);
+}
+.evm-chart-title {
+  color: #0f3f5c;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.evm-chart-container {
+  margin: 0;
+  background: #fff;
+  border-radius: 0 0 14px 14px;
+  box-shadow: 0 8px 24px rgba(12, 70, 102, 0.08);
+  padding: 1.25rem;
+  border: 1px solid #d7ecfb;
+  border-top: none;
+}
+canvas {
+  max-width: 100%;
+  height: clamp(220px, 44vw, 350px) !important;
+}
+
+@media (max-width: 768px) {
+  .evm-chart-title-bar,
+  .evm-chart-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
